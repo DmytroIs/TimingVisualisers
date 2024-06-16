@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"F:\\Games\\UE_Projects\\TimingVisualiser\\Source\\TimingVisualiser\\TimingVisualiser.Build.cs",
+		"F:\\Games\\UE_Projects\\TimingVisualiser\\Source\\TimingVisualiser.Target.cs",
+		"F:\\Games\\UE_Projects\\TimingVisualiser\\Source\\TimingVisualiserEditor.Target.cs"
+	],
+	"EngineVersion": "5.4.2"
+}

@@ -1,0 +1,17 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"F:/Games/UE_Projects/TimingVisualiser/Content/StarterContent/Architecture/Floor_400x400.uasset",
+				"F:/Games/UE_Projects/TimingVisualiser/Content/TestABP.uasset",
+				"F:/Games/UE_Projects/TimingVisualiser/Content/LevelPrototyping/Meshes/BP_SM_Ramp.uasset",
+				"F:/Games/UE_Projects/TimingVisualiser/Content/LevelPrototyping/Meshes/SM_Ramp.uasset",
+				"F:/Games/UE_Projects/TimingVisualiser/Content/ThirdPerson/Blueprints/BP_ThirdPersonCharacter.uasset",
+				"F:/Games/UE_Projects/TimingVisualiser/Content/MyTestBPCOmponent.uasset"
+			]
+		}
+	]
+}

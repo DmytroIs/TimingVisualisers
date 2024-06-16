@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\TimingVisualiser.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\TimingVisualiser.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\TimingVisualiserEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\.vsconfig" />
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEditorPerProjectUserSettings.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEditorSettings.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\TimingVisualiser">
+      <UniqueIdentifier>{D865C376-7BF5-35DA-B5B0-1A24F5F7B4CD}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\TimingVisualiser\TimingVisualiser.Build.cs">
+      <Filter>Source\TimingVisualiser</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\TimingVisualiser\TimingVisualiser.cpp">
+      <Filter>Source\TimingVisualiser</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\TimingVisualiser\TimingVisualiser.h">
+      <Filter>Source\TimingVisualiser</Filter>
+    </ClInclude>
+    <Filter Include="Source\TimingVisualiser\Private">
+      <UniqueIdentifier>{969619C5-F272-3656-BE4F-BE374F6A3EA4}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\TimingVisualiser\Private\TimingVisualiser_AnimGraphNode.cpp">
+      <Filter>Source\TimingVisualiser\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TimingVisualiser\Private\TimingVisualiser_AnimNode.cpp">
+      <Filter>Source\TimingVisualiser\Private</Filter>
+    </ClCompile>
+    <Filter Include="Source\TimingVisualiser\Public">
+      <UniqueIdentifier>{5A016120-0A15-3301-9A86-B163A59D4CEC}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\TimingVisualiser\Public\TimingVisualiser_AnimGraphNode.h">
+      <Filter>Source\TimingVisualiser\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TimingVisualiser\Public\TimingVisualiser_AnimNode.h">
+      <Filter>Source\TimingVisualiser\Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

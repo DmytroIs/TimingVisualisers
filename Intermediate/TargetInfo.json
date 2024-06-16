@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "TimingVisualiser",
+			"Path": "..\\Source\\TimingVisualiser.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "TimingVisualiserEditor",
+			"Path": "..\\Source\\TimingVisualiserEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
