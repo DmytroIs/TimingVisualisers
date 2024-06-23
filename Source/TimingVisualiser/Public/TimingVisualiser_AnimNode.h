@@ -28,6 +28,8 @@ struct TIMINGVISUALISER_API FTimingVisualiser_AnimNode : public FAnimNode_Base
     //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
     //FName TestBoneName;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+    int CachedFramesNumber;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
 	float MinVelocity;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
     float ArrowMagnitude;
@@ -52,10 +54,9 @@ private:
 	USkinnedAsset* SkelMesh; // Skinned mesh asset
 	FReferenceSkeleton RefSkeleton; // Reference skeleton
 
-    TArray<BoneMotionData> MotionDataArrayCurrent; // Dynamic UE Array of BoneMotionData for each bone at the current frame
-	TArray<BoneMotionData> MotionDataArrayCached; // Dynamic UE Array of BoneMotionData for each bone at the next frame
+    TArray<TArray<BoneMotionData>> MotionDataArrays; // Dynamic UE Array of BoneMotionData for each bone by CachedFramesNumber number of frames
 
     void DebugDrawArrow(FComponentSpacePoseContext& Output, FVector vFrom, FVector vOrientation, float fMagnitude);
-	void GetBoneMotionDataAtFrame(FComponentSpacePoseContext& Output, float TimeStamp); // Get bone motion data at the given frame
+	void GetBoneMotionDataAtFrame(FComponentSpacePoseContext& Output); // Get bone motion data at the given frame
     void CalculateVelocity();
 };

@@ -7,6 +7,7 @@ FTimingVisualiser_AnimNode::FTimingVisualiser_AnimNode() : Super ()
 	//TestBoneName = FName(TEXT("head"));
 	MinVelocity = 0.1f;
 	ArrowMagnitude = 3.0f;
+	CachedFramesNumber = 4;
 }
 
 void FTimingVisualiser_AnimNode::Initialize_AnyThread(const FAnimationInitializeContext& Context)
@@ -32,11 +33,17 @@ void FTimingVisualiser_AnimNode::CacheBones_AnyThread(const FAnimationCacheBones
 
 void FTimingVisualiser_AnimNode::Update_AnyThread(const FAnimationUpdateContext& Context)
 {
-	Super::Update_AnyThread(Context);
-	MotionDataArrayCached = MotionDataArrayCurrent;
-	MotionDataArrayCurrent.Empty();
-	BasePose.Update(Context);
-	GetEvaluateGraphExposedInputs().Execute(Context);
+    Super::Update_AnyThread(Context);
+
+    TArray<BoneMotionData> NewFrameBoneMotionData;  // new empty array for the new frame
+    MotionDataArrays.Insert(NewFrameBoneMotionData, 0); // insert the new frame at the beginning of the cached motion data array
+    if (MotionDataArrays.Num() > CachedFramesNumber)   // Check if the cached motion data array has more than CachedFrames number of frames
+    {
+		MotionDataArrays.RemoveAt(MotionDataArrays.Num() - 1); // Delete the last element of the cached motion data array
+    }
+
+    BasePose.Update(Context);
+    GetEvaluateGraphExposedInputs().Execute(Context);
 }
 
 void FTimingVisualiser_AnimNode::GatherDebugData(FNodeDebugData& DebugData)
@@ -51,9 +58,10 @@ void FTimingVisualiser_AnimNode::EvaluateComponentSpace_AnyThread(FComponentSpac
 	Super::EvaluateComponentSpace_AnyThread(Output);
 	BasePose.EvaluateComponentSpace(Output);
 	//GEngine->AddOnScreenDebugMessage(-1, 0.03f, FColor::Red, FString::Printf(TEXT("MSG from EvaluateComponentSpace_AnyThread")));
-	GetBoneMotionDataAtFrame(Output, 0.0f);
-    float fDebugDrawDynamicMagnitude = 0.0f;
-	 for (const BoneMotionData& BoneData : MotionDataArrayCurrent) //TODO. it's totally temp, and it needs to make it nice
+	GetBoneMotionDataAtFrame(Output);
+    
+	float fDebugDrawDynamicMagnitude = 0.0f;
+	 for (const BoneMotionData& BoneData : MotionDataArrays[0]) //TODO. it's totally temp, and it needs to make it nice
 	 {
 	     float vectorLength = BoneData.Velocity.Length();
 	     if (vectorLength > fDebugDrawDynamicMagnitude)
@@ -63,7 +71,7 @@ void FTimingVisualiser_AnimNode::EvaluateComponentSpace_AnyThread(FComponentSpac
         // GEngine->AddOnScreenDebugMessage(-1, 0.03f, FColor::Red, FString::Printf(TEXT("max magnitude for the draw is: %f"), fDebugDrawDynamicMagnitude));
 
 	 }
-	for (const BoneMotionData& BoneData : MotionDataArrayCurrent)
+	for (const BoneMotionData& BoneData : MotionDataArrays[0])
 	{
 		if (BoneData.Velocity.Length()>MinVelocity)
 			DebugDrawArrow(Output, BoneData.Position, BoneData.Velocity, (fDebugDrawDynamicMagnitude/BoneData.Velocity.Length())*ArrowMagnitude);
@@ -85,7 +93,7 @@ void FTimingVisualiser_AnimNode::DebugDrawArrow(FComponentSpacePoseContext& Outp
 	DrawDebugDirectionalArrow(AnimInstanceObject->GetWorld(), vFrom, vTo, 2.0f, FColor::Yellow, false, -1, 1, 0.3f);
 }
 
-void FTimingVisualiser_AnimNode::GetBoneMotionDataAtFrame(FComponentSpacePoseContext& Output, float TimeStamp)
+void FTimingVisualiser_AnimNode::GetBoneMotionDataAtFrame(FComponentSpacePoseContext& Output)
 {
 	FTransform ComponentTransform = SkelMeshComponent->GetComponentTransform();
 	FTransform BoneTransform;
@@ -99,7 +107,7 @@ void FTimingVisualiser_AnimNode::GetBoneMotionDataAtFrame(FComponentSpacePoseCon
 			curBoneData.Position = ComponentTransform.TransformPosition(BoneTransform.GetLocation());	// Transform the bone's location to world space
 			curBoneData.Velocity = FVector(0.0f, 0.0f, 0.0f); //TODO Later
 			curBoneData.Acceleration = FVector(0.0f, 0.0f, 0.0f); //TODO Later
-			MotionDataArrayCurrent.Add(curBoneData);
+			MotionDataArrays[0].Add(curBoneData);
 		}
 		CalculateVelocity();
 	}
@@ -107,14 +115,22 @@ void FTimingVisualiser_AnimNode::GetBoneMotionDataAtFrame(FComponentSpacePoseCon
 
 void FTimingVisualiser_AnimNode::CalculateVelocity()
 {
-    for (int i = 0; i < MotionDataArrayCurrent.Num(); i++)
+    for (int boneIndex = 0; boneIndex < BonesCount; boneIndex++)
     {
-        if (MotionDataArrayCached.IsValidIndex(i))
+        FVector sumVelocity(0.0f, 0.0f, 0.0f);
+        int validFrames = 0;
+        for (int cachedFrame = 0; cachedFrame < MotionDataArrays.Num() - 1; cachedFrame++)
         {
-            FVector currentPosition = MotionDataArrayCurrent[i].Position;
-            FVector cachedPosition = MotionDataArrayCached[i].Position;
-            FVector velocity = currentPosition - cachedPosition;
-            MotionDataArrayCurrent[i].Velocity = velocity;
+            if (MotionDataArrays[cachedFrame].IsValidIndex(boneIndex) && MotionDataArrays[cachedFrame + 1].IsValidIndex(boneIndex))
+            {
+                sumVelocity += (MotionDataArrays[cachedFrame + 1][boneIndex].Position - MotionDataArrays[cachedFrame][boneIndex].Position);
+                validFrames++;
+            }
+        }
+        if (validFrames > 0)
+        {
+            MotionDataArrays[0][boneIndex].Velocity = sumVelocity / validFrames;
+            MotionDataArrays[0][boneIndex].Velocity *= -1; // Reverse the direction of the velocity vector
         }
     }
 }
