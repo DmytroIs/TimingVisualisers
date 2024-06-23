@@ -13,6 +13,7 @@
 struct BoneMotionData
 {
     int BoneIndex;
+    FName BoneName;
     FVector Position;
     FVector Velocity;
     FVector Acceleration;
@@ -30,9 +31,23 @@ struct TIMINGVISUALISER_API FTimingVisualiser_AnimNode : public FAnimNode_Base
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
     int CachedFramesNumber;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+    bool bDrawVelocities;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+    float VelocityArrowMagnitude;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
 	float MinVelocity;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+    bool bDrawAccelerations;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+    float AccelerationArrowMagnitude;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+    float MinAcceleration;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
-    float ArrowMagnitude;
+	bool bDrawCounterForces;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+	float DirectionThreshold;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+    TArray<FName> BoneNameFilterOut;
 
 public:
     // FAnimNode_Base interface
@@ -49,14 +64,21 @@ protected:
     AActor* OwningActor;
 
 private:
-    int BonesCount; // Number of bones in the skeleton
+    int iBonesCount; // Number of bones in the skeleton
 	USkinnedMeshComponent* SkelMeshComponent; // Skinned mesh component
 	USkinnedAsset* SkelMesh; // Skinned mesh asset
 	FReferenceSkeleton RefSkeleton; // Reference skeleton
 
     TArray<TArray<BoneMotionData>> MotionDataArrays; // Dynamic UE Array of BoneMotionData for each bone by CachedFramesNumber number of frames
 
-    void DebugDrawArrow(FComponentSpacePoseContext& Output, FVector vFrom, FVector vOrientation, float fMagnitude);
+    void DebugDrawArrow(FComponentSpacePoseContext& Output, FVector vFrom, FVector vOrientation, float fMagnitude, FColor Color);
 	void GetBoneMotionDataAtFrame(FComponentSpacePoseContext& Output); // Get bone motion data at the given frame
     void CalculateVelocity();
+    void DrawVelocities(FComponentSpacePoseContext& Output);
+    void CalculateAcceleration();
+	void DrawAccelerations(FComponentSpacePoseContext& Output);
+	float DetectCounterForce(FVector vVelocity, FVector vAcceleration, float AccelerationThreshold, float DotProductDirectionThreshold);
+	void DebugDrawPulsePoint(FComponentSpacePoseContext& Output, FVector vPosition, FColor Color, float fSize);
+	void DrawCounterForces(FComponentSpacePoseContext& Output);
+    bool ShouldFilterOutByName(FName BoneName);
 };

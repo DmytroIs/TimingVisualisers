@@ -19,7 +19,12 @@ FLinearColor UTimingVisualiser_AnimGraphNode::GetNodeTitleColor() const
 }
 FText UTimingVisualiser_AnimGraphNode::GetTooltipText() const
 {
-	return FText::FromString("Visualising Speed Vector of Bones");
+	return FText::FromString(
+		"CachedFramesNumber - how many frames to average velocity and acceleration\n"
+		"Min Velocity and Min Acceleration - the significance cutoff of the debug data\n"
+		"DirectionThreshold - a value between -1 and 1, from opposite to same direction,"
+		" with 0 for perpendicular (normalized dot product of velocity and acceleration)\n"
+		"Bone Names Filter Out (in the node settings) - remove the bone by part of the name from debug draw");
 }
 
 FText UTimingVisualiser_AnimGraphNode::GetNodeTitle(ENodeTitleType::Type TitleType) const
