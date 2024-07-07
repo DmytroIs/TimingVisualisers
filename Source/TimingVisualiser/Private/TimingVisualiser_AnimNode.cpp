@@ -11,6 +11,8 @@ FTimingVisualiser_AnimNode::FTimingVisualiser_AnimNode() : Super ()
 	AccelerationArrowMagnitude = 3.0f;
 	CachedFramesNumber = 8;
 	DirectionThreshold = -0.75f;
+	VelocityHistory = FDebugFloatHistory(180, 0.0f, 5000.0f, false);
+	AccelerationHistory = FDebugFloatHistory(180, 0.0f, 5000.0f, false);
 }
 //-------------------------------------------------------------------------------------------------------------
 void FTimingVisualiser_AnimNode::Initialize_AnyThread(const FAnimationInitializeContext& Context)
@@ -64,6 +66,8 @@ void FTimingVisualiser_AnimNode::EvaluateComponentSpace_AnyThread(FComponentSpac
 	if (bDrawVelocities) DrawVelocities(Output);
 	if (bDrawAccelerations) DrawAccelerations(Output);
 	if (bDrawCounterForces) DrawCounterForces(Output);
+	if (bDrawVelocityHistrogram) DebugDisplaySummedVelocity(Output);
+	if (bDrawAccelerationHistrogram) DebugDisplaySummedAcceleration(Output);
 }
 //-------------------------------------------------------------------------------------------------------------
 //void FTimingVisualiser_AnimNode::Evaluate_AnyThread(FPoseContext& Output)
@@ -227,7 +231,7 @@ void FTimingVisualiser_AnimNode::DrawCounterForces(FComponentSpacePoseContext& O
 		if (fCounterForce != 0.0f)
 		{
 			if (!ShouldFilterOutByName(BoneData.BoneName)) // Skip the bone if it's in the filter out list
-				DebugDrawPulsePoint(Output, BoneData.Position, FColor::Orange, FMath::Abs(fCounterForce)*10.0f);
+				DebugDrawPulsePoint(Output, BoneData.Position, FColor::Purple, FMath::Abs(fCounterForce)*10.0f);
 		}
 	}
 }
@@ -246,3 +250,31 @@ bool FTimingVisualiser_AnimNode::ShouldFilterOutByName(FName BoneName)
 	return bShouldFilterOut;
 }
 //-------------------------------------------------------------------------------------------------------------
+void FTimingVisualiser_AnimNode::DebugDisplaySummedVelocity(FComponentSpacePoseContext& Output)
+{
+	// TODO: to add limbs difinition and calculate the motion data per limbs, instead of current full body
+	float sum = 0.0f;
+	for (const TArray<BoneMotionData>& frame : MotionDataArrays)
+	{
+	    for (const BoneMotionData& boneData : frame)
+	    {
+	        sum += boneData.Velocity.Length();
+	    }
+	}
+	VelocityHistory.AddSample(sum*VelocityArrowMagnitude);
+	DrawDebugFloatHistory (*Output.AnimInstanceProxy->GetAnimInstanceObject()->GetWorld(), VelocityHistory, FVector(100, 50, 120), FVector2D(300, 100), FColor::Yellow);
+}
+//-------------------------------------------------------------------------------------------------------------
+void FTimingVisualiser_AnimNode::DebugDisplaySummedAcceleration(FComponentSpacePoseContext& Output)
+{
+	float sum = 0.0f;
+	for (const TArray<BoneMotionData>& frame : MotionDataArrays)
+	{
+		for (const BoneMotionData& boneData : frame)
+		{
+			sum += boneData.Acceleration.Length();
+		}
+	}
+	AccelerationHistory.AddSample(sum*AccelerationArrowMagnitude*10.0f);
+	DrawDebugFloatHistory(*Output.AnimInstanceProxy->GetAnimInstanceObject()->GetWorld(), AccelerationHistory, FVector(100, 50, 10), FVector2D(300, 100), FColor::Red);
+}

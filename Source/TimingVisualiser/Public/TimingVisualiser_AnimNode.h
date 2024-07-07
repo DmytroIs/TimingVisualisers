@@ -6,6 +6,7 @@
 #include "AnimationRuntime.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/SkeletalMesh.h"
+#include "Kismet/KismetSystemLibrary.h"
 //#include "Components/SkinnedMeshComponent.h"
 
 #include "TimingVisualiser_AnimNode.generated.h"
@@ -48,6 +49,10 @@ struct TIMINGVISUALISER_API FTimingVisualiser_AnimNode : public FAnimNode_Base
 	float DirectionThreshold;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
     TArray<FName> BoneNameFilterOut;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+	bool bDrawVelocityHistrogram;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+	bool bDrawAccelerationHistrogram;
 
 public:
     // FAnimNode_Base interface
@@ -68,6 +73,8 @@ private:
 	USkinnedMeshComponent* SkelMeshComponent; // Skinned mesh component
 	USkinnedAsset* SkelMesh; // Skinned mesh asset
 	FReferenceSkeleton RefSkeleton; // Reference skeleton
+	FDebugFloatHistory VelocityHistory; // History of velocity values
+	FDebugFloatHistory AccelerationHistory; // History of acceleration values
 
     TArray<TArray<BoneMotionData>> MotionDataArrays; // Dynamic UE Array of BoneMotionData for each bone by CachedFramesNumber number of frames
 
@@ -81,4 +88,6 @@ private:
 	void DebugDrawPulsePoint(FComponentSpacePoseContext& Output, FVector vPosition, FColor Color, float fSize);
 	void DrawCounterForces(FComponentSpacePoseContext& Output);
     bool ShouldFilterOutByName(FName BoneName);
+	void DebugDisplaySummedVelocity(FComponentSpacePoseContext& Output);
+	void DebugDisplaySummedAcceleration(FComponentSpacePoseContext& Output);
 };
